@@ -21,6 +21,7 @@ type ProductDefault struct {
 
 // FindByID returns a product
 func (s *ProductDefault) FindByID(id int) (product internal.Product, err error) {
+
 	// get the product from the repository
 	product, err = s.rp.FindByID(id)
 

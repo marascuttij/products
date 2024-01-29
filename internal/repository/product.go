@@ -16,24 +16,18 @@ type ProductMysql struct {
 
 func (p *ProductMysql) FindByID(id int) (product internal.Product, err error) {
 	// query
-	query := "SELECT id, name, quantity, code_value, is_published, expiration, price FROM product WHERE id = ?"
 
-	row, err := p.db.Query(query, id)
-
-	// check errors
-	if row.Err() != nil {
-		err = row.Err()
-	}
+	row := p.db.QueryRow("SELECT p.`id`, p.`name`, p.`quantity`, p.`code_value`, p.`is_published`, p.`expiration`, p.`price` FROM `products` AS  `p` WHERE p.`id` = ?", id)
 
 	// serialize the product
-	err = row.Scan(&product.ID, &product.Quantity, &product.CodeValue, &product.IsPublished, &product.Expiration, &product.Price)
+	err = row.Scan(&product.ID, &product.Name, &product.Quantity, &product.CodeValue, &product.IsPublished, &product.Expiration, &product.Price)
 
 	// check errors
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = internal.ErrProductRepositoryNotFound
-			return
 		}
+		return
 	}
 	return
 }
