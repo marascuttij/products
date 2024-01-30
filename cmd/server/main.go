@@ -34,6 +34,11 @@ func main() {
 
 	defer db.Close()
 
+	err = db.Ping()
+	if err != nil {
+		return
+	}
+
 	router := chi.NewRouter()
 
 	rp := repository.NewProductMysql(db)
@@ -43,9 +48,20 @@ func main() {
 	hd := handler.NewProductDefault(sv)
 
 	router.Route("/api/v1/products", func(r chi.Router) {
-		// - GET
+		// Get all
+		r.Get("/", hd.GetAll())
+
+		// Get by id
 		r.Get("/{id}", hd.GetByID())
 
+		// Delete
+		r.Delete("/{id}", hd.Delete())
+
+		// Create
+		r.Post("/", hd.Create())
+
+		// Update
+		r.Patch("/{id}", hd.Update())
 	})
 
 	err = http.ListenAndServe(":8080", router)
